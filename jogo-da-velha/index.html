@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jogo da Velha Pro - IA Especial</title>
+  <style>
+    :root {
+      --bg-color: #0f172a;
+      --card-bg: #1e293b;
+      --text-color: #f8fafc;
+      --primary-color: #38bdf8;
+      --secondary-color: #f97316;
+      --accent-color: #22c55e;
+      --border-color: #334155;
+      --hover-color: #475569;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .container {
+      background-color: var(--card-bg);
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+      max-width: 420px;
+      width: 100%;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 1.8rem;
+      margin-bottom: 5px;
+      color: var(--primary-color);
+    }
+
+    p.subtitle {
+      font-size: 0.9rem;
+      color: #94a3b8;
+      margin-bottom: 20px;
+    }
+
+    .controls {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      justify-content: center;
+    }
+
+    select, button {
+      background-color: var(--border-color);
+      color: var(--text-color);
+      border: 1px solid var(--border-color);
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    select:hover, button:hover {
+      background-color: var(--hover-color);
+    }
+
+    button.btn-reset {
+      background-color: var(--primary-color);
+      color: #0f172a;
+      font-weight: bold;
+    }
+
+    button.btn-reset:hover {
+      background-color: #7dd3fc;
+    }
+
+    .status-board {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 15px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .cell {
+      width: 100%;
+      aspect-ratio: 1;
+      background-color: var(--border-color);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.5rem;
+      font-weight: bold;
+      cursor: pointer;
+      user-select: none;
+      transition: transform 0.1s ease, background-color 0.2s ease;
+    }
+
+    .cell:hover {
+      background-color: var(--hover-color);
+      transform: scale(1.02);
+    }
+
+    .cell.x {
+      color: var(--primary-color);
+    }
+
+    .cell.o {
+      color: var(--secondary-color);
+    }
+
+    .cell.winner {
+      background-color: var(--accent-color);
+      color: #0f172a;
+      animation: pulse 0.6s infinite alternate;
+    }
+
+    @keyframes pulse {
+      from { transform: scale(1); }
+      to { transform: scale(1.05); }
+    }
+
+    .history {
+      font-family: monospace;
+      font-size: 0.85rem;
+      color: #94a3b8;
+      background: #0f172a;
+      padding: 8px;
+      border-radius: 6px;
+      word-break: break-all;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>Jogo da Velha Pro</h1>
+    <p class="subtitle">Engine Otimizada + Algoritmo Minimax</p>
+
+    <div class="controls">
+      <select id="modeSelect">
+        <option value="darth">Modo: Darth (Imbatível)</option>
+        <option value="yoda">Modo: Yoda (Equilibrado)</option>
+        <option value="pvp">Modo: 2 Jogadores</option>
+      </select>
+      <button id="btnReset" class="btn-reset">Reiniciar</button>
+    </div>
+
+    <div id="status" class="status-board">Vez do Jogador X</div>
+
+    <div id="grid" class="grid">
+      <div class="cell" data-index="0"></div>
+      <div class="cell" data-index="1"></div>
+      <div class="cell" data-index="2"></div>
+      <div class="cell" data-index="3"></div>
+      <div class="cell" data-index="4"></div>
+      <div class="cell" data-index="5"></div>
+      <div class="cell" data-index="6"></div>
+      <div class="cell" data-index="7"></div>
+      <div class="cell" data-index="8"></div>
+    </div>
+
+    <div class="history">
+      Sequência de jogadas: <span id="moveHistory">-</span>
+    </div>
+  </div>
+
+  <script>
+    /**
+     * MÓDULO 1: ENGINE LÓGICA DO JOGO (Pura, sem manipulação de DOM)
+     */
+    class TicTacToeEngine {
+      constructor() {
+        this.WINNING_COMBOS = [
+          [0, 1, 2], [3, 4, 5], [6, 7, 8], // Linhas
+          [0, 3, 6], [1, 4, 7], [2, 5, 8], // Colunas
+          [0, 4, 8], [2, 4, 6]             // Diagonais
+        ];
+        this.reset();
+      }
+
+      reset() {
+        this.board = Array(9).fill(null);
+        this.currentPlayer = 'X';
+        this.gameHistory = '';
+        this.isGameOver = false;
+      }
+
+      makeMove(index) {
+        if (this.board[index] !== null || this.isGameOver) return false;
+
+        this.board[index] = this.currentPlayer;
+        this.gameHistory += index.toString();
+        
+        const winInfo = this.checkWin(this.board, this.currentPlayer);
+        if (winInfo) {
+          this.isGameOver = true;
+          return { status: 'win', winner: this.currentPlayer, combo: winInfo.combo };
+        }
+
+        if (this.board.every(cell => cell !== null)) {
+          this.isGameOver = true;
+          return { status: 'tie' };
+        }
+
+        this.currentPlayer = this.currentPlayer === 'X' ? 'O' : 'X';
+        return { status: 'continue' };
+      }
+
+      checkWin(board, player) {
+        for (const combo of this.WINNING_COMBOS) {
+          if (combo.every(idx => board[idx] === player)) {
+            return { combo };
+          }
+        }
+        return null;
+      }
+
+      getEmptyIndices(board = this.board) {
+        return board
+          .map((val, idx) => val === null ? idx : null)
+          .filter(val => val !== null);
+      }
+
+      /**
+       * MÓDULO DE IA (Minimax com Poda Alpha-Beta)
+       */
+      getBestMove(aiPlayer, mode = 'darth') {
+        const emptyIndices = this.getEmptyIndices();
+
+        // Modo Yoda (Aleatório/Equilibrado em 40% das jogadas)
+        if (mode === 'yoda' && Math.random() < 0.4) {
+          const randomIndex = Math.floor(Math.random() * emptyIndices.length);
+          return emptyIndices[randomIndex];
+        }
+
+        let bestScore = -Infinity;
+        let bestMove = emptyIndices[0];
+        const humanPlayer = aiPlayer === 'X' ? 'O' : 'X';
+
+        for (const index of emptyIndices) {
+          this.board[index] = aiPlayer;
+          const score = this.minimax(this.board, 0, false, aiPlayer, humanPlayer, -Infinity, Infinity);
+          this.board[index] = null;
+
+          if (score > bestScore) {
+            bestScore = score;
+            bestMove = index;
+          }
+        }
+
+        return bestMove;
+      }
+
+      minimax(board, depth, isMaximizing, aiPlayer, humanPlayer, alpha, beta) {
+        if (this.checkWin(board, aiPlayer)) return 10 - depth;
+        if (this.checkWin(board, humanPlayer)) return depth - 10;
+        if (board.every(cell => cell !== null)) return 0;
+
+        if (isMaximizing) {
+          let maxEval = -Infinity;
+          for (const index of this.getEmptyIndices(board)) {
+            board[index] = aiPlayer;
+            const evalScore = this.minimax(board, depth + 1, false, aiPlayer, humanPlayer, alpha, beta);
+            board[index] = null;
+            maxEval = Math.max(maxEval, evalScore);
+            alpha = Math.max(alpha, evalScore);
+            if (beta <= alpha) break; // Poda Alpha
+          }
+          return maxEval;
+        } else {
+          let minEval = Infinity;
+          for (const index of this.getEmptyIndices(board)) {
+            board[index] = humanPlayer;
+            const evalScore = this.minimax(board, depth + 1, true, aiPlayer, humanPlayer, alpha, beta);
+            board[index] = null;
+            minEval = Math.min(minEval, evalScore);
+            beta = Math.min(beta, evalScore);
+            if (beta <= alpha) break; // Poda Beta
+          }
+          return minEval;
+        }
+      }
+    }
+
+    /**
+     * MÓDULO 2: INTERFACE GRÁFICA / UI CONTROLLER
+     */
+    document.addEventListener('DOMContentLoaded', () => {
+      const engine = new TicTacToeEngine();
+
+      const cells = document.querySelectorAll('.cell');
+      const statusEl = document.getElementById('status');
+      const moveHistoryEl = document.getElementById('moveHistory');
+      const modeSelect = document.getElementById('modeSelect');
+      const btnReset = document.getElementById('btnReset');
+
+      const updateUI = (result = null) => {
+        // Renderiza tabuleiro
+        engine.board.forEach((val, idx) => {
+          cells[idx].textContent = val || '';
+          cells[idx].className = 'cell' + (val ? ` ${val.toLowerCase()}` : '');
+        });
+
+        // Atualiza histórico de jogadas
+        moveHistoryEl.textContent = engine.gameHistory || '-';
+
+        // Destaca vitória se houver
+        if (result && result.status === 'win') {
+          result.combo.forEach(idx => cells[idx].classList.add('winner'));
+          statusEl.textContent = `Jogador ${result.winner} Venceu!`;
+        } else if (result && result.status === 'tie') {
+          statusEl.textContent = 'Empate (Deu Velha)!';
+        } else {
+          statusEl.textContent = `Vez do Jogador ${engine.currentPlayer}`;
+        }
+      };
+
+      const handleCellClick = (e) => {
+        const index = parseInt(e.target.dataset.index, 10);
+        if (engine.board[index] !== null || engine.isGameOver) return;
+
+        // Jogada Humana
+        const result = engine.makeMove(index);
+        updateUI(result);
+
+        // Turno da IA (se não for PvP e o jogo continuar)
+        const mode = modeSelect.value;
+        if (!engine.isGameOver && mode !== 'pvp' && engine.currentPlayer === 'O') {
+          setTimeout(() => {
+            const aiMove = engine.getBestMove('O', mode);
+            const aiResult = engine.makeMove(aiMove);
+            updateUI(aiResult);
+          }, 250);
+        }
+      };
+
+      const resetGame = () => {
+        engine.reset();
+        cells.forEach(cell => cell.className = 'cell');
+        updateUI();
+      };
+
+      // Event Listeners
+      cells.forEach(cell => cell.addEventListener('click', handleCellClick));
+      btnReset.addEventListener('click', resetGame);
+      modeSelect.addEventListener('change', resetGame);
+
+      // Inicialização
+      updateUI();
+    });
+  </script>
+</body>
+</html>
