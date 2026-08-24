@@ -38,7 +38,7 @@ Usar sempre a função de carregamento dos vetores a partir da string recebida.
 	}
 
 	/* Reset Button */
-	#but_reset {
+	.but_reset {
 		box-sizing: border-box;
 		width: 60px;
 		height: 25px;
@@ -53,7 +53,7 @@ Usar sempre a função de carregamento dos vetores a partir da string recebida.
 	}
 
 	/* Load Button */
-	#but_load {
+	.but_load {
 		box-sizing: border-box;
 		width: 60px;
 		height: 30px;
@@ -147,22 +147,22 @@ Usar sempre a função de carregamento dos vetores a partir da string recebida.
 		<br><br>
 		
 		<p>
-		<button id="but_load" onclick="limpaEntradas()">Clear</button> 
-		<button id="but_load" onclick="funcLuck()">Luck</button> 
-		<button id="but_load" onclick="funcLoad()">Load</button> 
-		<button id="but_load" onclick="NovoJogo()">New</button> 
+		<button class="but_load" onclick="limpaEntradas()">Clear</button> 
+		<button class="but_load" onclick="funcLuck()">Luck</button> 
+		<button class="but_load" onclick="funcLoad()">Load</button> 
+		<button class="but_load" onclick="NovoJogo()">New</button> 
 		</p>
 		<p>
-		<button id="but_load" onclick="funcPlayRandom()">Rand</button>
-		<button id="but_load" onclick="chamaJogadaPC()">Xprt</button>
-		<button id="but_load" onclick="funcPlayAllRandom()">All</button>
-		<button id="but_load" onclick="funcBloqueia()">Bloq</button>
+		<button class="but_load" onclick="funcPlayRandom()">Rand</button>
+		<button class="but_load" onclick="chamaJogadaPC()">Xprt</button>
+		<button class="but_load" onclick="funcPlayAllRandom()">All</button>
+		<button class="but_load" onclick="funcBloqueia()">Bloq</button>
 		</p>
 		
 		<p id="choices" style="font-size:90%;">
-		Fill: <input type="text" id="in_preencher" size=2 value=2> &emsp; 
-		Bloq: <input type="text" id="in_bloquear" size=2 value=2> &emsp; 
-		Rnds: <input type="text" id="in_rodadas" size=2 value=4>
+		Fill: <input type="text" id="in_preencher" size=2 value=3> &emsp; 
+		Bloq: <input type="text" id="in_bloquear" size=2 value=0> &emsp; 
+		Rnds: <input type="text" id="in_rodadas" size=2 value=0>
 		</p>
 		
 		<p id="choices">
@@ -170,24 +170,24 @@ Usar sempre a função de carregamento dos vetores a partir da string recebida.
 		as X:<input type="checkbox" id="checkPCplayer" onclick="funcPCPlayerClick()" checked> &emsp; 
 		level:
 		<select id="choiceLevel">
-			<option value="0">Easy</option>
-			<option value="1">Piece of Cake</option>
-			<option value="2" selected>Expert</option>
-			<option value="3">Daniel San</option>
-			<option value="4">Miyagi</option>
-			<option value="5">Ninja</option>
-			<!--option value="6">Luke Skywalker</option-->
-			<option value="7">Jedi</option>
-			<!--option value="8">Yoda</option -->
-			<option value="9">Darth Vader</option>
+			<option value="0">0 - Easy</option>
+			<option value="1">1 - Piece of cake</option>
+			<option value="2">2 - Expert</option>
+			<option value="3">3 - Daniel San</option>
+			<option value="4">4 - Miyagi</option>
+			<option value="5" selected>5 - Ninja</option>
+			<option value="6">6 - Jedi</option>
+			<option value="7">7 - Luke Skywalker</option>
+			<option value="8">8 - Yoda</option -->
+			<option value="9">9 - Darth Vader</option -->
 		</select>
 		</p>
 		
 		<p>
 		<!-- Button to reset game -->
-		<button id="but_reset" onclick="funcBack()"><</button>
-		<button id="but_reset" onclick="funcReset()">RESET</button>
-		<button id="but_reset" onclick="funcHelp()">?</button>
+		<button class="but_reset" onclick="funcBack()"><</button>
+		<button class="but_reset" onclick="funcReset()">RESET</button>
+		<button class="but_reset" onclick="funcHelp()">?</button>
 		</p>
 		
 	</div>
@@ -284,6 +284,8 @@ function funcButton(but) {
 // Function called whenever user tab on any box
 function funcCheckWinner() {
 
+	// ***  Usar as funções novas de teste de fim de jogo e retorno do resultado, passando a string do jogo, ou até mesmo lendo os valores atuais e montando string ou vetor.
+	
 	var resultado = ConsultaResultado(jogoatual);
 	
 	// Checking if Player X won. If so, disable all the other fields
@@ -357,8 +359,6 @@ Criar cenários iniciais que sejam interessantes
 
 
 
-//modeload = 0;
-
 function funcLoad(){
 	
 	limpaJogo();
@@ -413,14 +413,13 @@ function funcPlayRandom(){
 
 function funcPlayAllRandom(){
 	limpaJogo();
-	//turnOffPCmode():
+	// turnOffPCmode:
 	document.getElementById('checkPCmode').checked = false;
 	funcFillBoxes(9);
 }
 
 function NovoJogo(){
 	limpaJogo();
-	//if (document.getElementById('checkPCmode').checked) ...
 	funcPCPlayerClick();
 }
 
@@ -437,7 +436,6 @@ function limpaJogo(){
 		i++;
 	}
 	document.getElementById('print').innerHTML = "Player <b>X</b> turn (" + counterTurns + ")";
-	//funcPCPlayerClick();
 }
 
 function funcBloqueia(){
@@ -456,10 +454,8 @@ function funcBloqueia(){
 	if (bloqrounds >= freeboxes) document.getElementById('in_rodadas').value = freeboxes - 1;
 
 	bloqrounds = Number(document.getElementById('in_rodadas').value);
-	
 	flagXO = 'X';
 	document.getElementById('print').innerHTML = "Player <b>X</b> turn (" + counterTurns + ")";
-	//funcPCPlayerClick();
 }
 
 function funcFillBoxes(n){
@@ -477,7 +473,6 @@ function funcFillBoxes(n){
 function funcLoadBoxes(n){
 	var i = 0;
 	var boxnum = 0;
-	//while ( (i < n) && (countFreeBoxes() > 0) && (counterTurns < n) ) {
 	while ( (counterTurns < n) && (countFreeBoxes() > 0) ) {
 		boxnum = funcRandom0to(9);
 		if (testFreeBox(boxnum)) {
@@ -512,7 +507,6 @@ function funcBloqBox(i){
 	}
 	else return false;
 }
-
 
 function countEmptyBoxes(){
 	var i = 0;
@@ -566,8 +560,6 @@ function funcPCPlayerClick(){
 	//alert('PC player: ' + 	funcPCPlayer() + '; and flag: ' + flagXO);
 	if (funcPCmodeOn() && funcPCPlayer() == flagXO) chamaJogadaPC(); //funcFillBoxes(1);
 }
-
-
 
 
 
@@ -638,9 +630,6 @@ function atualizaPlacar(){
 
 
 
-
-
-
 function funcChangeBoxColor(turn, but){
 //		border: 1px solid red;
 //		"property:value;"
@@ -655,11 +644,7 @@ function funcChangeBoxColor(turn, but){
 
 
 
-
-
-
 // ==================================== Bloco de funções para Jogadas modo PC ====================================
-
 
 
 function pcLevel(level){
@@ -703,9 +688,6 @@ function chamaJogadaPC(){
 			null;
 	}
 }
-
-
-// ==================================== Bloco de funções para Jogadas modo PC ====================================
 
 function funcPlayEasy(){
 	funcFillBoxes(1);

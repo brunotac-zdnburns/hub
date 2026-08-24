@@ -38,7 +38,7 @@ Usar sempre a função de carregamento dos vetores a partir da string recebida.
 	}
 
 	/* Reset Button */
-	#but_reset {
+	.but_reset {
 		box-sizing: border-box;
 		width: 60px;
 		height: 25px;
@@ -53,7 +53,7 @@ Usar sempre a função de carregamento dos vetores a partir da string recebida.
 	}
 
 	/* Load Button */
-	#but_load {
+	.but_load {
 		box-sizing: border-box;
 		width: 60px;
 		height: 30px;
@@ -147,22 +147,22 @@ Usar sempre a função de carregamento dos vetores a partir da string recebida.
 		<br><br>
 		
 		<p>
-		<button id="but_load" onclick="limpaEntradas()">Clear</button> 
-		<button id="but_load" onclick="funcLuck()">Luck</button> 
-		<button id="but_load" onclick="funcLoad()">Load</button> 
-		<button id="but_load" onclick="NovoJogo()">New</button> 
+		<button class="but_load" onclick="limpaEntradas()">Clear</button> 
+		<button class="but_load" onclick="funcLuck()">Luck</button> 
+		<button class="but_load" onclick="funcLoad()">Load</button> 
+		<button class="but_load" onclick="NovoJogo()">New</button> 
 		</p>
 		<p>
-		<button id="but_load" onclick="funcPlayRandom()">Rand</button>
-		<button id="but_load" onclick="chamaJogadaPC()">Xprt</button>
-		<button id="but_load" onclick="funcPlayAllRandom()">All</button>
-		<button id="but_load" onclick="funcBloqueia()">Bloq</button>
+		<button class="but_load" onclick="funcPlayRandom()">Rand</button>
+		<button class="but_load" onclick="chamaJogadaPC()">Xprt</button>
+		<button class="but_load" onclick="funcPlayAllRandom()">All</button>
+		<button class="but_load" onclick="funcBloqueia()">Bloq</button>
 		</p>
 		
 		<p id="choices" style="font-size:90%;">
-		Fill: <input type="text" id="in_preencher" size=2 value=2> &emsp; 
-		Bloq: <input type="text" id="in_bloquear" size=2 value=2> &emsp; 
-		Rnds: <input type="text" id="in_rodadas" size=2 value=4>
+		Fill: <input type="text" id="in_preencher" size=2 value=3> &emsp; 
+		Bloq: <input type="text" id="in_bloquear" size=2 value=0> &emsp; 
+		Rnds: <input type="text" id="in_rodadas" size=2 value=0>
 		</p>
 		
 		<p id="choices">
@@ -175,19 +175,19 @@ Usar sempre a função de carregamento dos vetores a partir da string recebida.
 			<option value="2">2 - Expert</option>
 			<option value="3">3 - Daniel San</option>
 			<option value="4">4 - Miyagi</option>
-			<option value="5">5 - Ninja</option>
-			<option value="6">6 - Luke Skywalker</option>
-			<option value="7">7 - Jedi</option>
-			<option value="8" selected>8 - Yoda</option -->
+			<option value="5" selected>5 - Ninja</option>
+			<option value="6">6 - Jedi</option>
+			<option value="7">7 - Luke Skywalker</option>
+			<option value="8">8 - Yoda</option -->
 			<option value="9">9 - Darth Vader</option -->
 		</select>
 		</p>
 		
 		<p>
 		<!-- Button to reset game -->
-		<button id="but_reset1" onclick="funcBack()"><</button>
-		<button id="but_reset2" onclick="funcReset()">RESET</button>
-		<button id="but_reset3" onclick="funcHelp()">?</button>
+		<button class="but_reset" onclick="funcBack()"><</button>
+		<button class="but_reset" onclick="funcReset()">RESET</button>
+		<button class="but_reset" onclick="funcHelp()">?</button>
 		</p>
 		
 	</div>
@@ -824,25 +824,25 @@ function funcPlayDaniSan(){
 	if (consulta == "") funcFillBoxes(1);
 }
 
+
+
+// ==================================== Bloco de funções para PlayExpert ====================================
+
 function funcPlayExpert(){
 
-	alert(readRound2());
+	//alert(readRound2());
 	
 	switch (counterTurns) {
 		case 0:
 			funcFillBoxes(1);
 			break;
 		case 1:
-			if (testFreeBox(4)) funcButton(4);
-			else
-			if (testFreeBox(2)) funcButton(2);
-			else
-			if (testFreeBox(0)) funcButton(0);
-			else
-			if (testFreeBox(6)) funcButton(6);
-			else
-			if (testFreeBox(8)) funcButton(8);
-			else funcFillBoxes(1);
+			if (testFreeBox(4)) funcButton(4); else
+			if (testFreeBox(2)) funcButton(2); else
+			if (testFreeBox(0)) funcButton(0); else
+			if (testFreeBox(6)) funcButton(6); else
+			if (testFreeBox(8)) funcButton(8); else 
+			funcFillBoxes(1);
 			break;
 		case 2:
 			//Esta jogada ainda está aleatória. Para ficar mais difícil, tem que ser feita a leitura das duas casas preenchidas e definir as melhores opções.
